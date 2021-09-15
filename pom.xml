@@ -17,14 +17,18 @@
 			<artifactId>aws-lambda-java-events</artifactId>
 			<version>3.9.0</version>
 		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/software.amazon.awssdk/protocol-core -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>protocol-core</artifactId>
+			<artifactId>regions</artifactId>
 			<version>2.17.39</version>
-		</dependency> -->
-
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-stepfunctions -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-stepfunctions</artifactId>
+			<version>1.12.67</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
