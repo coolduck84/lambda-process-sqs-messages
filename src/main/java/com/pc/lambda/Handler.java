@@ -22,9 +22,6 @@ public class Handler implements RequestHandler<SQSEvent, String> {
 	public String handleRequest(SQSEvent event, Context context) {
 		LambdaLogger logger = context.getLogger();
 		logger.log("\nEvent => " + gson.toJson(event));
-		logger.log("\nContext => " + gson.toJson(context));
-
-		AWSStepFunctions sfnClient = AWSStepFunctionsClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
 		String input = null;
 		for (SQSMessage msg : event.getRecords()) {
@@ -34,13 +31,11 @@ public class Handler implements RequestHandler<SQSEvent, String> {
 
 		try {
 			StartExecutionRequest request = new StartExecutionRequest()
-					.withStateMachineArn(System.getenv("stepFunctionARN"))
-					.withInput(input);
+					.withStateMachineArn(System.getenv("stepFunctionARN")).withInput(input);
 
-			logger.log("Starting Execution....\n");
+			AWSStepFunctions sfnClient = AWSStepFunctionsClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 			StartExecutionResult result = sfnClient.startExecution(request);
-
-			logger.log("Request ID: " + result.getSdkResponseMetadata().getRequestId() + "\n");
+			logger.log("\nStep Function Request ID: " + result.getSdkResponseMetadata().getRequestId());
 		} catch (AmazonServiceException ase) {
 			logger.log("Caught an AmazonServiceException, which means"
 					+ " your request made it to Amazon Step Functions, but was"
@@ -56,8 +51,7 @@ public class Handler implements RequestHandler<SQSEvent, String> {
 					+ "trying to communicate with Step Functions, such as not " + "being able to access the network.");
 			logger.log("Error Message: " + ace.getMessage());
 		}
-		
-		logger.log("\n");
+
 		return "Processed successfully";
 	}
 }
