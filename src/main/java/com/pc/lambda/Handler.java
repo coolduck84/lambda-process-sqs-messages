@@ -14,38 +14,27 @@ import com.amazonaws.services.stepfunctions.model.StartExecutionRequest;
 import com.amazonaws.services.stepfunctions.model.StartExecutionResult;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pc.lambda.model.LambdaDemoIO;
 
-public class Handler implements RequestHandler<SQSEvent, LambdaDemoIO> {
+public class Handler implements RequestHandler<SQSEvent, String> {
 
 	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	public LambdaDemoIO handleRequest(SQSEvent event, Context context) {
-
+	public String handleRequest(SQSEvent event, Context context) {
 		LambdaLogger logger = context.getLogger();
-		logger.log("event => " + gson.toJson(event) + "\n");
-		logger.log("context => " + gson.toJson(context) + "\n");
+		logger.log("\nEvent => " + gson.toJson(event));
+		logger.log("\nContext => " + gson.toJson(context));
 
-		Regions region = Regions.US_EAST_1;
-		AWSStepFunctions sfnClient = AWSStepFunctionsClientBuilder.standard()
-				// .withCredentials(credentialsProvider)
-				.withRegion(region).build();
+		AWSStepFunctions sfnClient = AWSStepFunctionsClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
-		LambdaDemoIO response = new LambdaDemoIO();
 		String input = null;
 		for (SQSMessage msg : event.getRecords()) {
 			input = msg.getBody();
-			logger.log("input: " + input + "\n");
-			response = gson.fromJson(input, LambdaDemoIO.class);
+			logger.log("\nInput: " + input);
 		}
-
-		logger.log("===========================================\n");
-		logger.log("Getting Started with Amazon Step Functions\n");
-		logger.log("===========================================\n");
 
 		try {
 			StartExecutionRequest request = new StartExecutionRequest()
-					.withStateMachineArn("arn:aws:states:us-east-1:052843378853:stateMachine:MyStateMachine")
+					.withStateMachineArn(System.getenv("stepFunctionARN"))
 					.withInput(input);
 
 			logger.log("Starting Execution....\n");
@@ -68,10 +57,7 @@ public class Handler implements RequestHandler<SQSEvent, LambdaDemoIO> {
 			logger.log("Error Message: " + ace.getMessage());
 		}
 		
-		logger.log("===========================================\n");
-		logger.log("Execution Ended for Amazon Step Functions\n");
-		logger.log("===========================================\n");
-
-		return response;
+		logger.log("\n");
+		return "Processed successfully";
 	}
 }
